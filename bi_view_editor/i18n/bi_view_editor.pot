@@ -14,6 +14,27 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: bi_view_editor
+#. openerp-web
+#: code:addons/bi_view_editor/static/src/xml/bi_view_editor.xml:0
+#, python-format
+msgid "#{field.model_name} (#{field.model})"
+msgstr ""
+
+#. module: bi_view_editor
+#. openerp-web
+#: code:addons/bi_view_editor/static/src/xml/bi_view_editor.xml:0
+#, python-format
+msgid "#{model}"
+msgstr ""
+
+#. module: bi_view_editor
+#. openerp-web
+#: code:addons/bi_view_editor/static/src/xml/bi_view_editor.xml:0
+#, python-format
+msgid "#{name}"
+msgstr ""
+
+#. module: bi_view_editor
 #: code:addons/bi_view_editor/models/bve_view.py:0
 #, python-format
 msgid ""
@@ -72,6 +93,11 @@ msgstr ""
 #. module: bi_view_editor
 #: model:ir.model,name:bi_view_editor.model_bve_view_line
 msgid "BI View Editor Lines"
+msgstr ""
+
+#. module: bi_view_editor
+#: model:res.groups,name:bi_view_editor.group_bve_manager
+msgid "BI View Editor Manager"
 msgstr ""
 
 #. module: bi_view_editor
