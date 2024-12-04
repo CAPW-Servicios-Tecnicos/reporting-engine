@@ -20,7 +20,12 @@ class SqlExport(models.Model):
         "need to link the sql query with a cron to send mail automatically",
     )
     cron_ids = fields.Many2many(
-        "ir.cron", "cron_sqlquery_rel", "sql_id", "cron_id", "Crons"
+        "ir.cron",
+        "cron_sqlquery_rel",
+        "sql_id",
+        "cron_id",
+        "Crons",
+        groups="base.group_system",
     )
     # We could implement other conditions, that is why it is a selection field
     mail_condition = fields.Selection(
@@ -87,7 +92,9 @@ class SqlExport(models.Model):
 
     @api.model
     def _run_all_sql_export_for_cron(self, cron_ids):
-        exports = self.search([("cron_ids", "in", cron_ids)])
+        exports = self.search(
+            [("cron_ids", "in", cron_ids), ("state", "=", "sql_valid")]
+        )
         for export in exports:
             if "%(company_id)s" in export.query and "%(user_id)s" not in export.query:
                 variable_dict = {}
@@ -113,10 +120,10 @@ class SqlExport(models.Model):
             else:
                 export.send_mail()
 
-    @api.constrains("field_ids", "mail_user_ids")
+    @api.constrains("query_properties_definition", "mail_user_ids")
     def check_no_parameter_if_sent_by_mail(self):
         for export in self:
-            if export.field_ids and export.mail_user_ids:
+            if export.query_properties_definition and export.mail_user_ids:
                 raise UserError(
                     _(
                         "It is not possible to execute and send a query "

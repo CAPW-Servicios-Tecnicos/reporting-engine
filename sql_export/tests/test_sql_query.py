@@ -4,7 +4,6 @@
 
 import base64
 
-from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase, tagged
 
@@ -61,17 +60,57 @@ class TestExportSqlQuery(TransactionCase):
                 sql_export.state, "sql_valid", "%s is a valid request" % (query)
             )
 
-    def _test_sql_query_with_params(self):
+    def test_sql_query_with_params(self):
         query = self.env.ref("sql_export.sql_export_partner_with_variables")
+        query.write({"state": "sql_valid"})
         categ_id = self.env.ref("base.res_partner_category_0").id
         wizard = self.wizard_obj.create(
             {
                 "sql_export_id": query.id,
-                "x_date": fields.Date.today(),
-                "x_id": 1,
-                "x_partner_categ_ids": [(6, 0, [categ_id])],
+            }
+        )
+        wizard.write(
+            {
+                "query_properties": [
+                    {
+                        "name": "630eca383bc142e6",
+                        "string": "Date",
+                        "type": "date",
+                        "default": "",
+                        "value": "2023-02-03",
+                    },
+                    {
+                        "name": "ec0556e22932334b",
+                        "string": "Categories",
+                        "type": "many2many",
+                        "default": False,
+                        "comodel": "res.partner.category",
+                        "domain": False,
+                        "value": [[categ_id, "Consulting Services"]],
+                    },
+                    {
+                        "name": "907ac618eccbab74",
+                        "string": "ID",
+                        "type": "integer",
+                        "default": False,
+                        "value": 1,
+                    },
+                ]
             }
         )
         wizard.export_sql()
         export = base64.b64decode(wizard.binary_file)
         self.assertTrue(export)
+
+    def test_keep_generated_file(self):
+        """Test that we keep generated files"""
+        self.sql_report_demo.keep_generated_file = True
+        wizard = self.wizard_obj.create(
+            {
+                "sql_export_id": self.sql_report_demo.id,
+            }
+        )
+        wizard.export_sql()
+        attachment = wizard._get_field_attachment()
+        wizard.sudo().unlink()
+        self.assertTrue(attachment.exists())
